@@ -68,7 +68,7 @@ gulp.task('browserify', function () {
         .pipe(source('main.js'));
     if (PRODUCTION)
         stream = stream.pipe(streamify(uglify()));
-    stream.pipe(gulp.dest('./dist/js'));
+    stream.pipe(gulp.dest('./' + DIST_FOLDER + '/js'));
 });
 
 gulp.task('test', function (done) {
@@ -86,11 +86,11 @@ gulp.task('views', function () {
 });
 
 gulp.task('watch', ['build', 'serve'], function () {
-    gulp.watch(['scripts/*.js', 'scripts/**/*.js'], [
+    gulp.watch(['bootstrapper.js', 'scripts/**/*.js'], [
         'browserify'
     ]);
 
-    gulp.watch(['styles/**/*.scss'], [
+    gulp.watch(['bootstrapper.css', 'styles/**/*.scss'], [
         'styles'
     ]);
 
@@ -100,6 +100,8 @@ gulp.task('watch', ['build', 'serve'], function () {
 
     gulp.watch('./' + DIST_FOLDER + '/**').on('change', refresh.changed);
 });
+
+gulp.task('watch-test', ['build', 'serve', 'test']);
 
 gulp.task('serve', function () {
     server.listen(serverport);
