@@ -17,6 +17,7 @@ var gulp = require('gulp'),
     express = require('express'),
     refresh = require('gulp-livereload'),
     livereload = require('connect-livereload'),
+    lrserver = require('tiny-lr')(),
     livereloadport = 35729,
     serverport = 5000,
     server = express();
@@ -58,7 +59,9 @@ gulp.task('styles', function () {
         .pipe(autoprefixer('last 2 versions', '> 1%', 'ie 8'));
     if (PRODUCTION)
         stream = stream.pipe(minify());
-    stream.pipe(gulp.dest(DIST_FOLDER + '/css/'));
+    stream
+        .pipe(gulp.dest(DIST_FOLDER + '/css/'))
+        .pipe(refresh(lrserver));
 });
 
 gulp.task('browserify', function () {
@@ -68,7 +71,9 @@ gulp.task('browserify', function () {
         .pipe(source('main.js'));
     if (PRODUCTION)
         stream = stream.pipe(streamify(uglify()));
-    stream.pipe(gulp.dest('./' + DIST_FOLDER + '/js'));
+    stream
+        .pipe(gulp.dest('./' + DIST_FOLDER + '/js'))
+        .pipe(refresh(lrserver));
 });
 
 gulp.task('test', function (done) {
@@ -82,7 +87,8 @@ gulp.task('views', function () {
     gulp.src('index.html')
         .pipe(gulp.dest(DIST_FOLDER));
     gulp.src('views/**/*')
-        .pipe(gulp.dest(DIST_FOLDER + '/views/'));
+        .pipe(gulp.dest(DIST_FOLDER + '/views/'))
+        .pipe(refresh(lrserver));
 });
 
 gulp.task('watch', ['build', 'serve'], function () {
@@ -97,8 +103,6 @@ gulp.task('watch', ['build', 'serve'], function () {
     gulp.watch(['views/**/*.html'], [
         'views'
     ]);
-
-    gulp.watch('./' + DIST_FOLDER + '/**').on('change', refresh.changed);
 });
 
 gulp.task('watch-test', ['build', 'serve', 'test']);
