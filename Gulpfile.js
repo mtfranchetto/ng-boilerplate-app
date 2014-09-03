@@ -37,10 +37,12 @@ server.all('/*', function (req, res) {
     res.sendfile('index.html', { root: DIST_FOLDER });
 });
 
-gulp.task('build', ['clean', 'views', 'styles', 'browserify']);
+gulp.task('build', ['clean'], function () {
+    gulp.start(['views', 'styles', 'browserify']);
+});
 
 gulp.task('clean', function () {
-    gulp.src('./' + DIST_FOLDER + '/', { read: false })
+    return gulp.src('./' + DIST_FOLDER + '/', { read: false })
         .pipe(plumber())
         .pipe(rimraf({force: true}));
 });
