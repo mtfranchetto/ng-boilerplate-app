@@ -111,7 +111,7 @@ gulp.task('watch', ['build', 'serve'], function () {
         'browserify'
     ]);
 
-    gulp.watch(['bootstrapper.css', 'styles/**/*.scss'], [
+    gulp.watch(['bootstrapper.scss', 'styles/**/*.scss'], [
         'styles'
     ]);
 
