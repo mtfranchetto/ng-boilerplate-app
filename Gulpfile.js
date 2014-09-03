@@ -28,7 +28,8 @@ env(__dirname + '/.env');
 var PRODUCTION = process.env.ENVIRONMENT === 'production',
     DIST_FOLDER = 'dist',
     KARMA_CONFIG = '/karma.conf.js',
-    BUNDLE_FILENAME = "main";
+    BUNDLE_FILENAME = "main",
+    notifyReload = false;
 
 
 server.use(livereload({port: livereloadport}));
@@ -39,7 +40,7 @@ server.all('/*', function (req, res) {
 });
 
 gulp.task('build', ['clean'], function () {
-    gulp.start(['views', 'styles', 'browserify']);
+    gulp.start('views', 'styles', 'browserify');
 });
 
 gulp.task('clean', function () {
@@ -62,9 +63,9 @@ gulp.task('styles', function () {
         .pipe(autoprefixer('last 2 versions', '> 1%', 'ie 8'));
     if (PRODUCTION)
         stream = stream.pipe(minify());
-    stream
-        .pipe(gulp.dest(DIST_FOLDER + '/css/'))
-        .pipe(refresh(lrserver));
+    stream = stream.pipe(gulp.dest(DIST_FOLDER + '/css/'))
+    if (notifyReload)
+        stream.pipe(refresh(lrserver));
 });
 
 gulp.task('browserify', function () {
@@ -86,9 +87,9 @@ gulp.task('browserify', function () {
         .pipe(source('main.js'));
     if (PRODUCTION)
         stream = stream.pipe(streamify(uglify()));
-    stream
-        .pipe(gulp.dest('./' + DIST_FOLDER + '/js'))
-        .pipe(refresh(lrserver));
+    stream = stream.pipe(gulp.dest('./' + DIST_FOLDER + '/js'));
+    if (notifyReload)
+        stream.pipe(refresh(lrserver));
 });
 
 gulp.task('test', function (done) {
@@ -101,26 +102,30 @@ gulp.task('test', function (done) {
 gulp.task('views', function () {
     gulp.src('index.html')
         .pipe(gulp.dest(DIST_FOLDER));
-    gulp.src('views/**/*')
-        .pipe(gulp.dest(DIST_FOLDER + '/views/'))
-        .pipe(refresh(lrserver));
+    var stream = gulp.src('views/**/*').pipe(gulp.dest(DIST_FOLDER + '/views/'));
+    if (notifyReload)
+        stream.pipe(refresh(lrserver));
 });
 
-gulp.task('watch', ['build', 'serve'], function () {
-    gulp.watch(['bootstrapper.js', 'scripts/**/*.js'], [
-        'browserify'
-    ]);
+gulp.task('watch', function () {
+    notifyReload = true;
 
-    gulp.watch(['bootstrapper.scss', 'styles/**/*.scss'], [
-        'styles'
-    ]);
+    gulp.start('build', 'serve', function () {
+        gulp.watch(['bootstrapper.js', 'scripts/**/*.js'], [
+            'browserify'
+        ]);
 
-    gulp.watch(['views/**/*.html'], [
-        'views'
-    ]);
+        gulp.watch(['bootstrapper.scss', 'styles/**/*.scss'], [
+            'styles'
+        ]);
+
+        gulp.watch(['views/**/*.html'], [
+            'views'
+        ]);
+    });
 });
 
-gulp.task('watch-test', ['build', 'serve', 'test']);
+gulp.task('watch-test', ['watch', 'test']);
 
 gulp.task('serve', function () {
     server.listen(serverport);
