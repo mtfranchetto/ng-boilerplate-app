@@ -67,8 +67,20 @@ gulp.task('styles', function () {
 });
 
 gulp.task('browserify', function () {
-    var stream = browserify('./bootstrapper.js')
-        .bundle({ debug: !PRODUCTION})
+    var stream = browserify({
+        entries: ['./bootstrapper.js'],
+        noParse: [
+            require.resolve('jquery'),
+            require.resolve('angular/angular'),
+            require.resolve('angular/angular.mocks'),
+            require.resolve('angular/angular.sanitize'),
+            require.resolve('angular/angular.resource'),
+            require.resolve('angular/angular.route'),
+            require.resolve('angular/angular.animate'),
+            require.resolve('underscore')
+        ]
+    })
+        .bundle({ debug: !PRODUCTION })
         .pipe(plumber())
         .pipe(source('main.js'));
     if (PRODUCTION)
