@@ -18,6 +18,7 @@ var gulp = require('gulp'),
     refresh = require('gulp-livereload'),
     livereload = require('connect-livereload'),
     lrserver = require('tiny-lr')(),
+    gutil = require('gulp-util'),
     livereloadport = 35729,
     serverport = 5000,
     server = express();
@@ -81,7 +82,7 @@ gulp.task('browserify', function () {
         ]
     })
         .bundle({ debug: !PRODUCTION })
-        .pipe(plumber())
+        .on('error', gutil.log)
         .pipe(source('main.js'));
     if (PRODUCTION)
         stream = stream.pipe(streamify(uglify()));
