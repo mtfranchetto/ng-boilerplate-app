@@ -88,12 +88,8 @@ gulp.task('browserify', function () {
         fullPaths: true
     };
 
-    var bundleStream;
-    if (watching)
-        bundleStream = watchify(browserify(browserifyOptions));
-    else
-        bundleStream = browserify(browserifyOptions);
-
+    var bundleStream = watching ? watchify(browserify(browserifyOptions)) :
+    							  browserify(browserifyOptions);
     if (watching)
         bundleStream.on('update', rebundle);
 
