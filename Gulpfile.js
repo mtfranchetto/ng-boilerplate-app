@@ -7,6 +7,7 @@ var gulp = require('gulp'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
     streamify = require('gulp-streamify'),
+    watchify = require('watchify'),
     autoprefixer = require('gulp-autoprefixer'),
     minify = require('gulp-minify-css'),
     concat = require('gulp-concat'),
@@ -29,7 +30,7 @@ var PRODUCTION = process.env.ENVIRONMENT === 'production',
     DIST_FOLDER = 'dist',
     KARMA_CONFIG = '/karma.conf.js',
     BUNDLE_FILENAME = "main",
-    notifyReload = false;
+    watching = false;
 
 
 server.use(livereload({port: livereloadport}));
@@ -64,12 +65,12 @@ gulp.task('styles', function () {
     if (PRODUCTION)
         stream = stream.pipe(minify());
     stream = stream.pipe(gulp.dest(DIST_FOLDER + '/css/'))
-    if (notifyReload)
+    if (watching)
         stream.pipe(refresh(lrserver));
 });
 
 gulp.task('browserify', function () {
-    var stream = browserify({
+    var browserifyOptions = {
         entries: ['./bootstrapper.js'],
         noParse: [
             require.resolve('jquery'),
@@ -80,41 +81,62 @@ gulp.task('browserify', function () {
             require.resolve('angular/angular.route'),
             require.resolve('angular/angular.animate'),
             require.resolve('underscore')
-        ]
-    })
-        .bundle({ debug: !PRODUCTION })
-        .on('error', gutil.log)
-        .pipe(source('main.js'));
-    if (PRODUCTION)
-        stream = stream.pipe(streamify(uglify()));
-    stream = stream.pipe(gulp.dest('./' + DIST_FOLDER + '/js'));
-    if (notifyReload)
-        stream.pipe(refresh(lrserver));
+        ],
+        debug: !PRODUCTION,
+        cache: {},
+        packageCache: {},
+        fullPaths: true
+    };
+
+    var bundleStream;
+    if (watching)
+        bundleStream = watchify(browserify(browserifyOptions));
+    else
+        bundleStream = browserify(browserifyOptions);
+
+    if (watching)
+        bundleStream.on('update', rebundle);
+
+    function rebundle() {
+        var stream = bundleStream.bundle()
+            .on('error', gutil.log)
+            .pipe(source('main.js'));
+        if (PRODUCTION)
+            stream = stream.pipe(streamify(uglify()));
+        stream = stream.pipe(gulp.dest('./' + DIST_FOLDER + '/js'));
+        if (watching)
+            stream.pipe(refresh(lrserver));
+    }
+
+    return rebundle();
 });
 
 gulp.task('test', function (done) {
+    console.log(PRODUCTION);
     karma.start({
         configFile: __dirname + KARMA_CONFIG,
         singleRun: PRODUCTION
-    }, done);
+    }, function () {
+        console.log(PRODUCTION);
+    	if (!PRODUCTION)
+    		gulp.start('test');
+    	else
+    		done();
+    });
 });
 
 gulp.task('views', function () {
     gulp.src('index.html')
         .pipe(gulp.dest(DIST_FOLDER));
     var stream = gulp.src('views/**/*').pipe(gulp.dest(DIST_FOLDER + '/views/'));
-    if (notifyReload)
+    if (watching)
         stream.pipe(refresh(lrserver));
 });
 
 gulp.task('watch', function () {
-    notifyReload = true;
+    watching = true;
 
     gulp.start('build', 'serve', function () {
-        gulp.watch(['bootstrapper.js', 'scripts/**/*.js'], [
-            'browserify'
-        ]);
-
         gulp.watch(['bootstrapper.scss', 'styles/**/*.scss'], [
             'styles'
         ]);
