@@ -52,5 +52,8 @@
   "browserify-shim": {
     "jquery": "$",
     "underscore": "_"
+  },
+  "dependencies": {
+    "bootstrap": "^3.2.0"
   }
 }
