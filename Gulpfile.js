@@ -112,12 +112,10 @@ gulp.task('browserify', function () {
 });
 
 gulp.task('test', function (done) {
-    console.log(PRODUCTION);
     karma.start({
         configFile: __dirname + KARMA_CONFIG,
         singleRun: PRODUCTION
     }, function () {
-        console.log(PRODUCTION);
     	if (!PRODUCTION)
     		gulp.start('test');
     	else
