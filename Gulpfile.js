@@ -41,7 +41,7 @@ server.all('/*', function (req, res) {
 });
 
 gulp.task('build', ['clean'], function () {
-    gulp.start('views', 'styles', 'browserify');
+    gulp.start('views', 'styles', 'images', 'browserify');
 });
 
 gulp.task('clean', function () {
@@ -125,6 +125,10 @@ gulp.task('views', function () {
     var stream = gulp.src('views/**/*').pipe(gulp.dest(DIST_FOLDER + '/views/'));
     if (watching)
         stream.pipe(refresh(lrserver));
+});
+
+gulp.task('images', function () {
+    gulp.src('images/**/*').pipe(gulp.dest(DIST_FOLDER + '/images/'));
 });
 
 gulp.task('watch', function () {
