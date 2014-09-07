@@ -11,6 +11,7 @@ var gulp = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     minify = require('gulp-minify-css'),
     concat = require('gulp-concat'),
+    watch = require('gulp-watch'),
     sass = require('gulp-sass'),
     plumber = require('gulp-plumber'),
     karma = require('karma').server,
@@ -128,20 +129,22 @@ gulp.task('views', function () {
 });
 
 gulp.task('images', function () {
-    gulp.src('images/**/*').pipe(gulp.dest(DIST_FOLDER + '/images/'));
+    var stream = gulp.src('images/**/*').pipe(gulp.dest(DIST_FOLDER + '/images/'));
+    if (watching)
+        stream.pipe(refresh(lrserver));
 });
 
 gulp.task('watch', function () {
     watching = true;
 
     gulp.start('build', 'serve', function () {
-        gulp.watch(['bootstrapper.scss', 'styles/**/*.scss'], [
-            'styles'
-        ]);
+        gulp.watch(['bootstrapper.scss', 'styles/**/*.scss'], ['styles']);
 
-        gulp.watch(['views/**/*.html'], [
-            'views'
-        ]);
+        gulp.watch(['views/**/*.html'], ['views']);
+
+        watch(['images/*'], function () {
+            gulp.start('images');
+        });
     });
 });
 
