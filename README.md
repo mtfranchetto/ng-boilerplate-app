@@ -63,3 +63,7 @@ External NPM modules are based on **[ng-boilerplate-module](https://github.com/m
 To enable uglify/minify on JS/CSS you need to add to your .env file the following line:
 
 `ENVIRONMENT=production`
+
+##Contribute
+
+I am using [Git Flow](https://github.com/nvie/gitflow).
