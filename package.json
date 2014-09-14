@@ -59,5 +59,6 @@
     "jquery": "$",
     "underscore": "_",
     "angular": "angular"
-  }
+  },
+  "license": "MIT"
 }
