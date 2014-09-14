@@ -1,9 +1,15 @@
 {
   "name": "ng-boilerplate-app",
   "version": "0.0.1",
-  "devDependencies": {
-    "angular": "git+https://bitbucket.org/mtfranchetto/angular",
+  "description": "Boilerplate to start AngularJS applications",
+  "dependencies": {
     "bootstrap": "^3.2.0",
+    "browserify-angular": "^1.3.0",
+    "normalize-compass": "^3.0.1",
+    "jquery": "^2.1.1",
+    "underscore": "^1.7.0"
+  },
+  "devDependencies": {
     "browserify": "^5.5.0",
     "browserify-istanbul": "^0.1.2",
     "browserify-shim": "^3.7.0",
@@ -25,27 +31,21 @@
     "gulp-uglify": "^1.0.0",
     "gulp-util": "~2.2.14",
     "gulp-watch": "^1.0.2",
-    "jquery": "^2.1.1",
     "karma": "^0.12.23",
     "karma-browserify": "^0.2.1",
     "karma-chrome-launcher": "^0.1.4",
     "karma-coverage": "^0.2.6",
     "karma-jasmine": "~0.2.0",
     "karma-phantomjs-launcher": "^0.1.4",
-    "ng-boilerplate-module": "git+https://bitbucket.org/mtfranchetto/ng-boilerplate-module",
-    "ng-common": "git+https://bitbucket.org/mtfranchetto/ng-common",
     "node-env-file": "^0.1.3",
-    "normalize-sass": "git+https://bitbucket.org/mtfranchetto/normalize-sass",
-    "sinon": "git+https://bitbucket.org/mtfranchetto/sinon",
     "tiny-lr": "0.0.7",
-    "underscore": "^1.7.0",
     "vinyl-source-stream": "^0.1.1",
     "watchify": "^1.0.2"
   },
   "browser": {
     "jquery": "jquery/dist/jquery.min.js",
     "underscore": "underscore/underscore-min.js",
-    "angular": "angular"
+    "angular": "browserify-angular"
   },
   "engines": {
     "node": ">=0.10.0"

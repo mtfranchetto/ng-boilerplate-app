@@ -75,12 +75,12 @@ gulp.task('browserify', function () {
         entries: ['./bootstrapper.js'],
         noParse: [
             require.resolve('jquery'),
-            require.resolve('angular/angular'),
-            require.resolve('angular/angular.mocks'),
-            require.resolve('angular/angular.sanitize'),
-            require.resolve('angular/angular.resource'),
-            require.resolve('angular/angular.route'),
-            require.resolve('angular/angular.animate'),
+            require.resolve('browserify-angular/angular'),
+            require.resolve('browserify-angular/angular.mocks'),
+            require.resolve('browserify-angular/angular.sanitize'),
+            require.resolve('browserify-angular/angular.resource'),
+            require.resolve('browserify-angular/angular.route'),
+            require.resolve('browserify-angular/angular.animate'),
             require.resolve('underscore')
         ],
         debug: !PRODUCTION,
