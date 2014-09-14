@@ -1,6 +1,6 @@
 {
   "name": "ng-boilerplate-app",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Boilerplate to start AngularJS applications",
   "dependencies": {
     "bootstrap": "^3.2.0",
