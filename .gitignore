@@ -5,3 +5,4 @@ coverage/*
 .idea
 .idea/*
 npm-debug.log
+.env
