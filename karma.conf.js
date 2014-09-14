@@ -15,7 +15,8 @@ module.exports = function(config) {
     captureTimeout: 60000,
     singleRun: false,
     browserify: {
-      watch: true
+      watch: true,
+      transform: ['browserify-shim', 'browserify-istanbul']
     },
     preprocessors: {
         'test/*': ['browserify'],

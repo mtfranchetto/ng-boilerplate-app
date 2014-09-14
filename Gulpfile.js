@@ -7,9 +7,11 @@ var gulp = require('gulp'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
     streamify = require('gulp-streamify'),
+    watchify = require('watchify'),
     autoprefixer = require('gulp-autoprefixer'),
     minify = require('gulp-minify-css'),
     concat = require('gulp-concat'),
+    watch = require('gulp-watch'),
     sass = require('gulp-sass'),
     plumber = require('gulp-plumber'),
     karma = require('karma').server,
@@ -17,6 +19,8 @@ var gulp = require('gulp'),
     express = require('express'),
     refresh = require('gulp-livereload'),
     livereload = require('connect-livereload'),
+    lrserver = require('tiny-lr')(),
+    gutil = require('gulp-util'),
     livereloadport = 35729,
     serverport = 5000,
     server = express();
@@ -26,7 +30,8 @@ env(__dirname + '/.env');
 var PRODUCTION = process.env.ENVIRONMENT === 'production',
     DIST_FOLDER = 'dist',
     KARMA_CONFIG = '/karma.conf.js',
-    BUNDLE_FILENAME = "main";
+    BUNDLE_FILENAME = "main",
+    watching = false;
 
 
 server.use(livereload({port: livereloadport}));
@@ -36,10 +41,12 @@ server.all('/*', function (req, res) {
     res.sendfile('index.html', { root: DIST_FOLDER });
 });
 
-gulp.task('build', ['clean', 'views', 'styles', 'browserify']);
+gulp.task('build', ['clean'], function () {
+    gulp.start('views', 'styles', 'images', 'browserify');
+});
 
 gulp.task('clean', function () {
-    gulp.src('./' + DIST_FOLDER + '/', { read: false })
+    return gulp.src('./' + DIST_FOLDER + '/', { read: false })
         .pipe(plumber())
         .pipe(rimraf({force: true}));
 });
@@ -58,48 +65,90 @@ gulp.task('styles', function () {
         .pipe(autoprefixer('last 2 versions', '> 1%', 'ie 8'));
     if (PRODUCTION)
         stream = stream.pipe(minify());
-    stream.pipe(gulp.dest(DIST_FOLDER + '/css/'));
+    stream = stream.pipe(gulp.dest(DIST_FOLDER + '/css/'))
+    if (watching)
+        stream.pipe(refresh(lrserver));
 });
 
 gulp.task('browserify', function () {
-    var stream = browserify('./bootstrapper.js')
-        .bundle({ debug: !PRODUCTION})
-        .pipe(plumber())
-        .pipe(source('main.js'));
-    if (PRODUCTION)
-        stream = stream.pipe(streamify(uglify()));
-    stream.pipe(gulp.dest('./dist/js'));
+    var browserifyOptions = {
+        entries: ['./bootstrapper.js'],
+        noParse: [
+            require.resolve('jquery'),
+            require.resolve('browserify-angular/angular'),
+            require.resolve('browserify-angular/angular.mocks'),
+            require.resolve('browserify-angular/angular.sanitize'),
+            require.resolve('browserify-angular/angular.resource'),
+            require.resolve('browserify-angular/angular.route'),
+            require.resolve('browserify-angular/angular.animate'),
+            require.resolve('underscore')
+        ],
+        debug: !PRODUCTION,
+        cache: {},
+        packageCache: {},
+        fullPaths: true
+    };
+
+    var bundleStream = watching ? watchify(browserify(browserifyOptions)) :
+    							  browserify(browserifyOptions);
+    if (watching)
+        bundleStream.on('update', rebundle);
+
+    function rebundle() {
+        var stream = bundleStream.bundle()
+            .on('error', gutil.log)
+            .pipe(source('main.js'));
+        if (PRODUCTION)
+            stream = stream.pipe(streamify(uglify()));
+        stream = stream.pipe(gulp.dest('./' + DIST_FOLDER + '/js'));
+        if (watching)
+            stream.pipe(refresh(lrserver));
+    }
+
+    return rebundle();
 });
 
 gulp.task('test', function (done) {
     karma.start({
         configFile: __dirname + KARMA_CONFIG,
         singleRun: PRODUCTION
-    }, done);
+    }, function () {
+    	if (!PRODUCTION)
+    		gulp.start('test');
+    	else
+    		done();
+    });
 });
 
 gulp.task('views', function () {
     gulp.src('index.html')
         .pipe(gulp.dest(DIST_FOLDER));
-    gulp.src('views/**/*')
-        .pipe(gulp.dest(DIST_FOLDER + '/views/'));
+    var stream = gulp.src('views/**/*').pipe(gulp.dest(DIST_FOLDER + '/views/'));
+    if (watching)
+        stream.pipe(refresh(lrserver));
 });
 
-gulp.task('watch', ['build', 'serve'], function () {
-    gulp.watch(['scripts/*.js', 'scripts/**/*.js'], [
-        'browserify'
-    ]);
-
-    gulp.watch(['styles/**/*.scss'], [
-        'styles'
-    ]);
-
-    gulp.watch(['views/**/*.html'], [
-        'views'
-    ]);
-
-    gulp.watch('./' + DIST_FOLDER + '/**').on('change', refresh.changed);
+gulp.task('images', function () {
+    var stream = gulp.src('images/**/*').pipe(gulp.dest(DIST_FOLDER + '/images/'));
+    if (watching)
+        stream.pipe(refresh(lrserver));
 });
+
+gulp.task('watch', function () {
+    watching = true;
+
+    gulp.start('build', 'serve', function () {
+        gulp.watch(['bootstrapper.scss', 'styles/**/*.scss'], ['styles']);
+
+        gulp.watch(['views/**/*.html'], ['views']);
+
+        watch(['images/*'], function () {
+            gulp.start('images');
+        });
+    });
+});
+
+gulp.task('watch-test', ['watch', 'test']);
 
 gulp.task('serve', function () {
     server.listen(serverport);

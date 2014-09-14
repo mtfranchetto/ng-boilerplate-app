@@ -4,3 +4,4 @@ dist/*
 coverage/*
 .idea
 .idea/*
+npm-debug.log

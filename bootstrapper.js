@@ -1,10 +1,10 @@
 'use strict';
 
-require('angular');
+require('browserify-angular');
 require('jquery');
 require('underscore');
 
-var SampleController = require('./scripts/controllers/SampleController'),
-    app = angular.module('sampleApp', []);
+var app = angular.module('sampleApp', []);
 
-app.controller('SampleController', ['$scope', SampleController]);
+app.controller('SampleController', ['$scope', require('./scripts/controllers/SampleController')]);
+
