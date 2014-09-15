@@ -99,7 +99,7 @@ gulp.task('browserify', function () {
             .on('error', gutil.log)
             .pipe(source('main.js'));
         if (PRODUCTION)
-            stream = stream.pipe(streamify(uglify()));
+            stream = stream.pipe(streamify(uglify({ mangle: false })));
         stream = stream.pipe(gulp.dest('./' + DIST_FOLDER + '/js'));
         if (watching)
             stream.pipe(refresh(lrserver));
