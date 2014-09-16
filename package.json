@@ -47,9 +47,8 @@
     "watchify": "^1.0.2"
   },
   "browser": {
-    "jquery": "jquery/dist/jquery.min.js",
-    "underscore": "underscore/underscore-min.js",
-    "angular": "browserify-angular"
+    "jquery": "./node_modules/jquery/dist/jquery.min.js",
+    "underscore": "./node_modules/underscore/underscore-min.js"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -61,8 +60,7 @@
   },
   "browserify-shim": {
     "jquery": "$",
-    "underscore": "_",
-    "angular": "angular"
+    "underscore": "_"
   },
   "license": "MIT"
 }
