@@ -48,7 +48,8 @@
   },
   "browser": {
     "jquery": "./node_modules/jquery/dist/jquery.min.js",
-    "underscore": "./node_modules/underscore/underscore-min.js"
+    "underscore": "./node_modules/underscore/underscore-min.js",
+    "angular": "browserify-angular"
   },
   "engines": {
     "node": ">=0.10.0"
