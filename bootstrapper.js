@@ -1,6 +1,6 @@
 'use strict';
 
-require('browserify-angular');
+require('angular');
 require('jquery');
 require('underscore');
 
