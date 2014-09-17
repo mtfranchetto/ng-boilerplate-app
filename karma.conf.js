@@ -16,6 +16,7 @@ module.exports = function(config) {
     singleRun: false,
     browserify: {
       watch: true,
+      debug: true,
       transform: ['browserify-shim', 'browserify-istanbul']
     },
     preprocessors: {
