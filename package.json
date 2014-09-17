@@ -36,7 +36,7 @@
     "gulp-util": "~2.2.14",
     "gulp-watch": "^1.0.2",
     "karma": "^0.12.23",
-    "karma-browserify": "^0.2.1",
+    "karma-bro": "^0.7.0",
     "karma-chrome-launcher": "^0.1.4",
     "karma-coverage": "^0.2.6",
     "karma-jasmine": "~0.2.0",
