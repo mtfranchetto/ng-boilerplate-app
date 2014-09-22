@@ -8,6 +8,7 @@ var gulp = require('gulp'),
     source = require('vinyl-source-stream'),
     streamify = require('gulp-streamify'),
     watchify = require('watchify'),
+    gulpif = require('gulp-if'),
     autoprefixer = require('gulp-autoprefixer'),
     minify = require('gulp-minify-css'),
     concat = require('gulp-concat'),
@@ -58,16 +59,14 @@ gulp.task('lint', function () {
 });
 
 gulp.task('styles', function () {
-    var stream = gulp.src(['bootstrapper.scss', 'styles/*.scss'])
+    gulp.src(['bootstrapper.scss', 'styles/*.scss'])
         .pipe(concat(BUNDLE_FILENAME + '.css'))
         .pipe(plumber())
         .pipe(sass())
-        .pipe(autoprefixer('last 2 versions', '> 1%', 'ie 8'));
-    if (PRODUCTION)
-        stream = stream.pipe(minify());
-    stream = stream.pipe(gulp.dest(DIST_FOLDER + '/css/'))
-    if (watching)
-        stream.pipe(refresh(lrserver));
+        .pipe(autoprefixer('last 2 versions', '> 1%', 'ie 8'))
+        .pipe(gulpif(PRODUCTION, minify()))
+        .pipe(gulp.dest(DIST_FOLDER + '/css/'))
+        .pipe(gulpif(watching, refresh(lrserver)));
 });
 
 gulp.task('browserify', function () {
@@ -90,19 +89,17 @@ gulp.task('browserify', function () {
     };
 
     var bundleStream = watching ? watchify(browserify(browserifyOptions)) :
-    							  browserify(browserifyOptions);
+        browserify(browserifyOptions);
     if (watching)
         bundleStream.on('update', rebundle);
 
     function rebundle() {
-        var stream = bundleStream.bundle()
+        bundleStream.bundle()
             .on('error', gutil.log)
-            .pipe(source('main.js'));
-        if (PRODUCTION)
-            stream = stream.pipe(streamify(uglify()));
-        stream = stream.pipe(gulp.dest('./' + DIST_FOLDER + '/js'));
-        if (watching)
-            stream.pipe(refresh(lrserver));
+            .pipe(source('main.js'))
+            .pipe(gulpif(PRODUCTION, streamify(uglify())))
+            .pipe(gulp.dest('./' + DIST_FOLDER + '/js'))
+            .pipe(gulpif(watching, refresh(lrserver)));
     }
 
     return rebundle();
@@ -113,25 +110,25 @@ gulp.task('test', function (done) {
         configFile: __dirname + KARMA_CONFIG,
         singleRun: PRODUCTION
     }, function () {
-    	if (!PRODUCTION)
-    		gulp.start('test');
-    	else
-    		done();
+        if (!PRODUCTION)
+            gulp.start('test');
+        else
+            done();
     });
 });
 
 gulp.task('views', function () {
     gulp.src('index.html')
         .pipe(gulp.dest(DIST_FOLDER));
-    var stream = gulp.src('views/**/*').pipe(gulp.dest(DIST_FOLDER + '/views/'));
-    if (watching)
-        stream.pipe(refresh(lrserver));
+    gulp.src('views/**/*')
+        .pipe(gulp.dest(DIST_FOLDER + '/views/'))
+        .pipe(gulpif(watching, refresh(lrserver)));
 });
 
 gulp.task('images', function () {
-    var stream = gulp.src('images/**/*').pipe(gulp.dest(DIST_FOLDER + '/images/'));
-    if (watching)
-        stream.pipe(refresh(lrserver));
+    gulp.src('images/**/*')
+        .pipe(gulp.dest(DIST_FOLDER + '/images/'))
+        .pipe(gulpif(watching, refresh(lrserver)));
 });
 
 gulp.task('watch', function () {
