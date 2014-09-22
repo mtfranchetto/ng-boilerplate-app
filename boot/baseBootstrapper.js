@@ -11,12 +11,12 @@ var common = require('ng-common'),
 
 app.register('SampleController', ProviderTypes.CONTROLLER, ['$scope', require('../scripts/controllers/SampleController')]);
 
-/*app.register('$routeProvider', ProviderTypes.CONFIG, ['$routeProvider', function($routeProvider) {
+app.register('$routeProvider', ProviderTypes.CONFIG, ['$routeProvider', function($routeProvider) {
     $routeProvider
         .when('/', {
             templateUrl: 'views/sample.html',
             controller: 'SampleController'
         });
-}]);*/
+}]);
 
 module.exports = app;

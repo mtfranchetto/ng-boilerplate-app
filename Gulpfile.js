@@ -14,6 +14,7 @@ var gulp = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     minify = require('gulp-minify-css'),
     concat = require('gulp-concat'),
+    embedlr = require('gulp-embedlr'),
     minimist = require('minimist'),
     watch = require('gulp-watch'),
     sass = require('gulp-sass'),
@@ -136,6 +137,7 @@ gulp.task('test', function (done) {
 
 gulp.task('views', function () {
     gulp.src('index.html')
+        .pipe(gulpif(watching, embedlr()))
         .pipe(gulp.dest(getDistDirectory()));
     gulp.src('views/**/*')
         .pipe(gulp.dest(getDistDirectory() + 'views/'))
