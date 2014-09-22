@@ -10,7 +10,7 @@
     "bootstrap": "^3.2.0",
     "browserify-angular": "^1.3.0",
     "jquery": "^2.1.1",
-    "ng-common": "^0.2.0",
+    "ng-common": "^0.2.4",
     "normalize-compass": "^3.0.1",
     "underscore": "^1.7.0"
   },
@@ -50,7 +50,6 @@
   },
   "browser": {
     "jquery": "./node_modules/jquery/dist/jquery.min.js",
-    "underscore": "./node_modules/underscore/underscore-min.js",
     "angular": "browserify-angular"
   },
   "engines": {

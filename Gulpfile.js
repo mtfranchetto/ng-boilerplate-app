@@ -3,6 +3,8 @@
 var gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     rimraf = require('gulp-rimraf'),
+    fs = require('fs'),
+    _ = require('underscore'),
     env = require('node-env-file'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
@@ -12,6 +14,7 @@ var gulp = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     minify = require('gulp-minify-css'),
     concat = require('gulp-concat'),
+    minimist = require('minimist'),
     watch = require('gulp-watch'),
     sass = require('gulp-sass'),
     plumber = require('gulp-plumber'),
@@ -28,26 +31,40 @@ var gulp = require('gulp'),
 
 env(__dirname + '/.env');
 
-var PRODUCTION = process.env.ENVIRONMENT === 'production',
-    DIST_FOLDER = 'dist',
+var DIST_FOLDER = 'dist',
     KARMA_CONFIG = '/karma.conf.js',
     BUNDLE_FILENAME = "main",
-    watching = false;
+    watching = false,
+    currentVariant = getVariantOption("debug-main");
 
-
+server.use(express.static(getDistDirectory()));
 server.use(livereload({port: livereloadport}));
-server.use(express.static('./' + DIST_FOLDER));
 
 server.all('/*', function (req, res) {
-    res.sendfile('index.html', { root: DIST_FOLDER });
+    res.sendfile('index.html', { root: getDistDirectory() });
 });
 
 gulp.task('build', ['clean'], function () {
-    gulp.start('views', 'styles', 'images', 'browserify');
+    var variant = getVariantOption(),
+        variants = [];
+    if (watching) {
+        variants = [currentVariant];
+    } else if (variant !== 'all') {
+        variants = [variant];
+    } else {
+        variants = getDirectories(__dirname + "/boot");
+        variants = _.flatten(_.map(variants, function (variant) {
+            return ['release-' + variant, 'debug-' + variant];
+        }));
+    }
+    _.each(variants, function (variant) {
+        currentVariant = variant;
+        gulp.start('views', 'styles', 'images', 'browserify');
+    });
 });
 
 gulp.task('clean', function () {
-    return gulp.src('./' + DIST_FOLDER + '/', { read: false })
+    return gulp.src(DIST_FOLDER, { read: false })
         .pipe(plumber())
         .pipe(rimraf({force: true}));
 });
@@ -59,19 +76,19 @@ gulp.task('lint', function () {
 });
 
 gulp.task('styles', function () {
-    gulp.src(['bootstrapper.scss', 'styles/*.scss'])
+    gulp.src('./boot/' + getVariantPart() + '/bootstrapper.scss')
         .pipe(concat(BUNDLE_FILENAME + '.css'))
         .pipe(plumber())
         .pipe(sass())
         .pipe(autoprefixer('last 2 versions', '> 1%', 'ie 8'))
-        .pipe(gulpif(PRODUCTION, minify()))
-        .pipe(gulp.dest(DIST_FOLDER + '/css/'))
+        .pipe(gulpif(isRelease(), minify()))
+        .pipe(gulp.dest(getDistDirectory() + 'css/'))
         .pipe(gulpif(watching, refresh(lrserver)));
 });
 
 gulp.task('browserify', function () {
     var browserifyOptions = {
-        entries: ['./bootstrapper.js'],
+        entries: ['./boot/' + getVariantPart() + '/bootstrapper.js'],
         noParse: [
             require.resolve('jquery'),
             require.resolve('browserify-angular/angular'),
@@ -82,7 +99,7 @@ gulp.task('browserify', function () {
             require.resolve('browserify-angular/angular.animate'),
             require.resolve('underscore')
         ],
-        debug: !PRODUCTION,
+        debug: !isRelease(),
         cache: {},
         packageCache: {},
         fullPaths: true
@@ -97,8 +114,8 @@ gulp.task('browserify', function () {
         bundleStream.bundle()
             .on('error', gutil.log)
             .pipe(source('main.js'))
-            .pipe(gulpif(PRODUCTION, streamify(uglify())))
-            .pipe(gulp.dest('./' + DIST_FOLDER + '/js'))
+            .pipe(gulpif(isRelease(), streamify(uglify())))
+            .pipe(gulp.dest(getDistDirectory() + 'js'))
             .pipe(gulpif(watching, refresh(lrserver)));
     }
 
@@ -108,9 +125,9 @@ gulp.task('browserify', function () {
 gulp.task('test', function (done) {
     karma.start({
         configFile: __dirname + KARMA_CONFIG,
-        singleRun: PRODUCTION
+        singleRun: !watching
     }, function () {
-        if (!PRODUCTION)
+        if (watching)
             gulp.start('test');
         else
             done();
@@ -119,23 +136,24 @@ gulp.task('test', function (done) {
 
 gulp.task('views', function () {
     gulp.src('index.html')
-        .pipe(gulp.dest(DIST_FOLDER));
+        .pipe(gulp.dest(getDistDirectory()));
     gulp.src('views/**/*')
-        .pipe(gulp.dest(DIST_FOLDER + '/views/'))
+        .pipe(gulp.dest(getDistDirectory() + 'views/'))
         .pipe(gulpif(watching, refresh(lrserver)));
 });
 
 gulp.task('images', function () {
     gulp.src('images/**/*')
-        .pipe(gulp.dest(DIST_FOLDER + '/images/'))
+        .pipe(gulp.dest(getDistDirectory() + 'images/'))
         .pipe(gulpif(watching, refresh(lrserver)));
 });
 
 gulp.task('watch', function () {
     watching = true;
+    currentVariant = getVariantOption("debug-main");
 
     gulp.start('build', 'serve', function () {
-        gulp.watch(['bootstrapper.scss', 'styles/**/*.scss'], ['styles']);
+        gulp.watch(['./boot/' + getVariantPart() + '/bootstrapper.scss'], ['styles']);
 
         gulp.watch(['views/**/*.html'], ['views']);
 
@@ -148,9 +166,45 @@ gulp.task('watch', function () {
 gulp.task('watch-test', ['watch', 'test']);
 
 gulp.task('serve', function () {
+    if (!currentVariant)
+        currentVariant = getVariantOption("debug-main");
+
     server.listen(serverport);
     refresh.listen(livereloadport);
-    console.log('App listening on http://localhost:' + serverport);
+    console.log('Variant ' + currentVariant + ' listening on http://localhost:' + serverport);
 });
 
 gulp.task('default', ['build']);
+
+function getDirectories(rootDir) {
+    var files = fs.readdirSync(rootDir),
+        directories = [];
+    _.each(files, function (file) {
+        if (file[0] != '.') {
+            var filePath = rootDir + '/' + file,
+                stat = fs.statSync(filePath);
+            if (stat.isDirectory())
+                directories.push(file);
+        }
+    });
+    return directories;
+}
+
+function isRelease() {
+    return currentVariant.indexOf("release") > -1;
+}
+
+function getDistDirectory() {
+    return DIST_FOLDER + '/' + currentVariant + '/';
+}
+
+function getVariantPart() {
+    return currentVariant.split('-')[1];
+}
+
+function getVariantOption(defaultOption) {
+    return minimist(process.argv.slice(2), {
+        string: 'variant',
+        default: { variant: defaultOption || 'release-main' }
+    }).variant;
+}
