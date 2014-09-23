@@ -154,7 +154,7 @@ gulp.task('watch', function () {
     currentVariant = getVariantOption("debug-main");
 
     gulp.start('build', 'serve', function () {
-        gulp.watch(['./boot/' + getVariantPart() + '/bootstrapper.scss'], ['styles']);
+        gulp.watch(['./boot/' + getVariantPart() + '/bootstrapper.scss', './styles/**/*.scss'], ['styles']);
 
         gulp.watch(['views/**/*.html'], ['views']);
 
