@@ -1,5 +1,5 @@
 "use strict";
 
-var app = require('../baseBootstrapper');
+var app = require('../base');
 
 app.run('sampleApp', ['ngRoute']);
