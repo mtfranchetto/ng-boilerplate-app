@@ -77,7 +77,7 @@ gulp.task('styles', function () {
     gulp.src('./boot/' + getVariantPart() + '/bootstrapper.scss')
         .pipe(concat(BUNDLE_FILENAME + '.css'))
         .pipe(plumber())
-        .pipe(sass())
+        .pipe(sass({ includePaths: ['./'] }))
         .pipe(autoprefixer('last 2 versions', '> 1%', 'ie 8'))
         .pipe(gulpif(isRelease(), minify()))
         .pipe(gulp.dest(getDistDirectory() + 'css/'))
