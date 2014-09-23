@@ -12,6 +12,7 @@ To wrap up, here's a list of the things available:
 * Live reloading
 * CSS automatic vendor prefixes
 * Compass support
+* Build variants
 * Code uglify
 * Source maps
 * TDD/BDD support
@@ -20,9 +21,11 @@ To wrap up, here's a list of the things available:
 
 ###CLI reference:
 
-`$ gulp build`
+`$ gulp build --variant=[variant|all]`
 
 Default task, used to package JS, Compass (CSS) files, images and templates.
+
+Optional: specify a custom variant to build (e.g. release-main).
 
 `$ gulp watch`
 
@@ -58,11 +61,6 @@ Packages images.
 
 ###Modules
 External NPM modules are based on **[ng-boilerplate-module](https://github.com/mtfranchetto/ng-boilerplate-module)**.
-
-###Production
-To enable uglify/minify on JS/CSS you need to add to your .env file the following line:
-
-`ENVIRONMENT=production`
 
 ##Contribute
 
