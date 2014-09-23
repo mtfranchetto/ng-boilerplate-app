@@ -85,6 +85,8 @@ gulp.task('styles', function () {
 });
 
 gulp.task('browserify', function () {
+    process.env.DEBUG = currentVariant.indexOf('debug') > -1;
+
     var browserifyOptions = {
         entries: ['./boot/' + getVariantPart() + '/bootstrapper.js'],
         noParse: [
