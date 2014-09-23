@@ -5,7 +5,6 @@ var gulp = require('gulp'),
     rimraf = require('gulp-rimraf'),
     fs = require('fs'),
     _ = require('lodash'),
-    env = require('node-env-file'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
     streamify = require('gulp-streamify'),
@@ -29,8 +28,6 @@ var gulp = require('gulp'),
     livereloadport = 35729,
     serverport = 5000,
     server = express();
-
-env(__dirname + '/.env');
 
 var DIST_FOLDER = 'dist',
     KARMA_CONFIG = '/karma.conf.js',
