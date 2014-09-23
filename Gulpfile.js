@@ -4,7 +4,7 @@ var gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     rimraf = require('gulp-rimraf'),
     fs = require('fs'),
-    _ = require('underscore'),
+    _ = require('lodash'),
     env = require('node-env-file'),
     browserify = require('browserify'),
     source = require('vinyl-source-stream'),
@@ -58,7 +58,7 @@ gulp.task('build', ['clean'], function () {
             return ['release-' + variant, 'debug-' + variant];
         }));
     }
-    _.each(variants, function (variant) {
+    _.forEach(variants, function (variant) {
         currentVariant = variant;
         gulp.start('views', 'styles', 'images', 'browserify');
     });
@@ -98,7 +98,7 @@ gulp.task('browserify', function () {
             require.resolve('browserify-angular/angular.resource'),
             require.resolve('browserify-angular/angular.route'),
             require.resolve('browserify-angular/angular.animate'),
-            require.resolve('underscore')
+            require.resolve('lodash')
         ],
         debug: !isRelease(),
         cache: {},
@@ -181,7 +181,7 @@ gulp.task('default', ['build']);
 function getDirectories(rootDir) {
     var files = fs.readdirSync(rootDir),
         directories = [];
-    _.each(files, function (file) {
+    _.forEach(files, function (file) {
         if (file[0] != '.') {
             var filePath = rootDir + '/' + file,
                 stat = fs.statSync(filePath);

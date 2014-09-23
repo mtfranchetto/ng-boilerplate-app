@@ -2,7 +2,7 @@
 
 require('angular');
 require('jquery');
-require('underscore');
+require('lodash');
 
 var common = require('ng-common'),
     BaseBootstrapper = common.BaseBootstrapper,
