@@ -62,7 +62,7 @@ gulp.task('build', ['clean'], function () {
 });
 
 gulp.task('clean', function () {
-    return gulp.src(DIST_FOLDER, { read: false })
+    return gulp.src([DIST_FOLDER, 'coverage/'], { read: false })
         .pipe(plumber())
         .pipe(rimraf({force: true}));
 });
