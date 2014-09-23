@@ -1,6 +1,6 @@
 {
     "name": "ng-boilerplate-app",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Boilerplate to start AngularJS applications",
     "repository": {
         "type": "git",
@@ -19,6 +19,7 @@
         "browserify-istanbul": "^0.1.2",
         "browserify-shim": "^3.7.0",
         "connect-livereload": "~0.4.0",
+        "envify": "^3.0.0",
         "express": "~4.1.1",
         "gulp": "^3.8.7",
         "gulp-autoprefixer": "0.0.10",
@@ -55,11 +56,10 @@
     },
     "browserify": {
         "transform": [
-            "browserify-shim"
+            "browserify-shim",
+            "envify"
         ]
     },
-    "browserify-shim": {
-
-    },
+    "browserify-shim": {},
     "license": "MIT"
 }

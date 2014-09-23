@@ -62,7 +62,7 @@ gulp.task('build', ['clean'], function () {
 });
 
 gulp.task('clean', function () {
-    return gulp.src(DIST_FOLDER, { read: false })
+    return gulp.src([DIST_FOLDER, 'coverage/'], { read: false })
         .pipe(plumber())
         .pipe(rimraf({force: true}));
 });
@@ -85,6 +85,8 @@ gulp.task('styles', function () {
 });
 
 gulp.task('browserify', function () {
+    process.env.DEBUG = currentVariant.indexOf('debug') > -1;
+
     var browserifyOptions = {
         entries: ['./boot/' + getVariantPart() + '/bootstrapper.js'],
         noParse: [
