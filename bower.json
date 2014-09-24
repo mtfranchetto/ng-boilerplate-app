@@ -1,0 +1,13 @@
+{
+    "name": "ng-boilerplate-app",
+    "version": "0.2.2",
+    "homepage": "https://github.com/mtfranchetto/ng-boilerplate-app",
+    "dependencies": {
+        "angular": "1.3.0-rc.3",
+        "angular-route": "1.3.0-rc.3"
+    },
+    "moduleType": [
+        "node"
+    ],
+    "license": "MIT"
+}
