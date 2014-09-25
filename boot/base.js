@@ -1,6 +1,7 @@
 "use strict";
 
 require('angular');
+require('angular-route');
 require('jquery');
 require('lodash');
 
