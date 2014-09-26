@@ -2,4 +2,4 @@
 
 var app = require('../base');
 
-app.run('sampleApp', ['ngRoute']);
+app.bootstrap('sampleApp', ['ngRoute']);
