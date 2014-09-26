@@ -19,7 +19,7 @@
         "debowerify": "^0.8.1",
         "envify": "^3.0.0",
         "gulp": "^3.8.7",
-        "smild": "^0.1.1"
+        "smild": "^0.1.2"
     },
     "engines": {
         "node": ">=0.10.0"
