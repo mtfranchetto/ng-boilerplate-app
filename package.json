@@ -16,7 +16,6 @@
         "browserify": "^5.5.0",
         "browserify-istanbul": "^0.1.2",
         "browserify-shim": "^3.7.0",
-        "debowerify": "^0.8.1",
         "envify": "^3.0.0",
         "gulp": "^3.8.7",
         "smild": "^0.1.3"
@@ -25,25 +24,29 @@
         "node": ">=0.10.0"
     },
     "browser": {
-        "jquery": "./node_modules/jquery/dist/jquery.js",
-        "angular": "./bower_components/angular/angular.js"
+        "angular": "./bower_components/angular/angular.js",
+        "angular-route": "./bower_components/angular-route/angular-route.js"
     },
     "browserify": {
         "transform": [
             "browserify-shim",
-            "debowerify",
             "envify"
         ]
     },
     "browserify-shim": {
-        "jquery": "jQuery",
         "angular": {
-            "depends": ["jquery"],
+            "depends": ["jquery:jQuery"],
             "exports": "angular"
         }
     },
     "license": "MIT",
     "scripts": {
         "install": "bower install"
+    },
+    "smild": {
+        "bundleNoParse": [
+            "../lodash",
+            "../jquery"
+        ]
     }
 }
