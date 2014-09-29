@@ -16,6 +16,7 @@
         "browserify": "^5.5.0",
         "browserify-istanbul": "^0.1.2",
         "browserify-shim": "^3.7.0",
+        "debowerify": "^0.8.2",
         "envify": "^3.0.0",
         "gulp": "^3.8.7",
         "smild": "^0.1.3"
