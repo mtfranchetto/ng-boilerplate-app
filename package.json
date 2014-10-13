@@ -1,6 +1,6 @@
 {
     "name": "ng-boilerplate-app",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "Boilerplate to start AngularJS applications",
     "repository": {
         "type": "git",
@@ -9,36 +9,46 @@
     "dependencies": {
         "jquery": "^2.1.1",
         "lodash": "^2.4.1",
-        "ng-common": "^0.4.0",
+        "ng-common": "^0.5.0",
         "normalize-compass": "^3.0.1"
     },
     "devDependencies": {
+        "brfs": "^1.2.0",
         "browserify": "^5.5.0",
         "browserify-istanbul": "^0.1.2",
         "browserify-shim": "^3.7.0",
-        "debowerify": "^0.8.1",
+        "debowerify": "^0.8.2",
         "envify": "^3.0.0",
         "gulp": "^3.8.7",
-        "smild": "^0.1.1"
+        "smild": "^0.1.4"
     },
     "engines": {
         "node": ">=0.10.0"
     },
     "browser": {
-        "angular": "./bower_components/angular/angular.js"
+        "angular": "./bower_components/angular/angular.js",
+        "angular-route": "./bower_components/angular-route/angular-route.js"
     },
     "browserify": {
         "transform": [
             "browserify-shim",
-            "debowerify",
             "envify"
         ]
     },
     "browserify-shim": {
-        "angular": "angular"
+        "angular": {
+            "depends": ["jquery:jQuery"],
+            "exports": "angular"
+        }
     },
     "license": "MIT",
     "scripts": {
         "install": "bower install"
+    },
+    "smild": {
+        "bundleNoParse": [
+            "../lodash",
+            "../jquery"
+        ]
     }
 }
